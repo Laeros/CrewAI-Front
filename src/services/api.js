@@ -1,11 +1,11 @@
 import axios from 'axios';
 
-// Detectar si estamos en producción
-const isProduction = process.env.NODE_ENV === 'production';
+// Detectar si estamos en producción (Vite usa import.meta.env.MODE)
+const isProduction = import.meta.env.MODE === 'production';
 
 // Configurar la base URL dependiendo del entorno
 const baseURL = isProduction
-  ? import.meta.env.VITE_API_URL || 'https://crewaiapp-production.up.railway.app/api'
+  ? import.meta.env.VITE_API_URL || 'https://web-production-31e3.up.railway.app/api'
   : 'http://localhost:5000/api'; // Local dev
 
 // Crear instancia de axios
@@ -60,7 +60,6 @@ api.interceptors.response.use(
       console.warn('⚠️ Sesión expirada o no autorizada. Redirigiendo al login...');
       clearAuthToken();
 
-      // Redireccionar al login (solo si estamos en navegador)
       if (typeof window !== 'undefined') {
         window.location.href = '/login';
       }
@@ -71,7 +70,6 @@ api.interceptors.response.use(
 
 // ------------ ENDPOINTS -------------------
 
-// Constantes para rutas
 const AUTH = '/auth';
 const AGENTS = '/agents';
 const TOOLS = '/tools';
@@ -163,7 +161,7 @@ export async function getProfile() {
 
 export async function getCurrentUser() {
   const res = await api.get(`${AUTH}/me`);
-  return res.data.user; // Asumiendo que el backend responde con { user: { ... } }
+  return res.data.user;
 }
 
 export async function changePassword(current_password, new_password) {
@@ -179,23 +177,23 @@ export async function updateProfile(data) {
   return res.data;
 }
 
-// ---------- Cargar token al iniciar --------
-loadAuthToken(); 
+// ---------- Admin -------------------------
 
-// Obtener todos los usuarios (solo admin)
 export async function fetchUsers() {
   const res = await api.get('/admin/users');
   return res.data.users;
 }
 
-// Promover o revocar permisos de admin
 export async function updateUserRole(userId, isAdmin) {
   const res = await api.put(`/admin/users/${userId}/role`, { isAdmin });
   return res.data;
 }
 
-// Logs repetidos/reportados
 export async function fetchLogs() {
   const res = await api.get('/admin/logs');
   return res.data.logs;
 }
+
+// --------- Token inicial ------------------
+
+loadAuthToken();
