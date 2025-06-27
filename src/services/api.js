@@ -1,19 +1,18 @@
 import axios from 'axios';
 
-// Detectar si estamos en producción (Vite usa import.meta.env.MODE)
-const isProduction = import.meta.env.MODE === 'production';
+// Detectar si estamos en producción
+const isProduction = process.env.NODE_ENV === 'production';
 
 // Configurar la base URL dependiendo del entorno
 const baseURL = isProduction
-  ? import.meta.env.VITE_API_URL || 'https://web-production-31e3.up.railway.app/api'
-  : 'http://localhost:5000/api'; // Local dev
+  ? import.meta.env.VITE_API_URL || 'https://crewaiapp-production.up.railway.app/api'
+  : 'http://localhost:5000/api';
 
 // Crear instancia de axios
 const api = axios.create({
   baseURL,
   headers: {
     'Content-Type': 'application/json',
-    console.log("👉 API URL:", baseURL);
   },
 });
 
@@ -60,6 +59,7 @@ api.interceptors.response.use(
       console.warn('⚠️ Sesión expirada o no autorizada. Redirigiendo al login...');
       clearAuthToken();
 
+      // Redireccionar al login (solo si estamos en navegador)
       if (typeof window !== 'undefined') {
         window.location.href = '/login';
       }
@@ -70,76 +70,80 @@ api.interceptors.response.use(
 
 // ------------ ENDPOINTS -------------------
 
-const AUTH = '/auth';
-const AGENTS = '/agents';
-const TOOLS = '/tools';
-const CHAT = '/chat';
+// Constantes para rutas - TODAS las rutas definidas aquí
+const ROUTES = {
+  AUTH: '/auth',
+  AGENTS: '/agents',
+  TOOLS: '/tools',
+  CHAT: '/chat',
+  ADMIN: '/admin'
+};
 
 // ----------- AGENTS -----------------------
 
 export async function fetchAgents() {
-  const res = await api.get(AGENTS);
+  const res = await api.get(ROUTES.AGENTS);
   return res.data;
 }
 
 export async function createAgent(agent) {
-  const res = await api.post(AGENTS, agent);
+  const res = await api.post(ROUTES.AGENTS, agent);
   return res.data;
 }
 
 export async function updateAgent(agentId, agent) {
-  const res = await api.put(`${AGENTS}/${agentId}`, agent);
+  const res = await api.put(`${ROUTES.AGENTS}/${agentId}`, agent);
   return res.data;
 }
 
 export async function deleteAgent(agentId) {
-  const res = await api.delete(`${AGENTS}/${agentId}`);
+  const res = await api.delete(`${ROUTES.AGENTS}/${agentId}`);
   return res.data;
 }
 
 // ------------- TOOLS ----------------------
 
 export async function fetchTools() {
-  const res = await api.get(TOOLS);
+  const res = await api.get(ROUTES.TOOLS);
   return res.data;
 }
 
 export async function createTool(tool) {
-  const res = await api.post(TOOLS, tool);
+  const res = await api.post(ROUTES.TOOLS, tool);
   return res.data;
 }
 
 export async function updateTool(toolId, tool) {
-  const res = await api.put(`${TOOLS}/${toolId}`, tool);
+  const res = await api.put(`${ROUTES.TOOLS}/${toolId}`, tool);
   return res.data;
 }
 
 export async function deleteTool(toolId) {
-  const res = await api.delete(`${TOOLS}/${toolId}`);
+  const res = await api.delete(`${ROUTES.TOOLS}/${toolId}`);
   return res.data;
 }
 
 // -------------- CHAT ----------------------
 
 export async function fetchChats(agentId) {
-  const res = await api.get(`${AGENTS}/${agentId}/chats`);
+  const res = await api.get(`${ROUTES.AGENTS}/${agentId}/chats`);
   return res.data;
 }
 
 export async function deleteChats(agentId) {
-  const res = await api.delete(`${AGENTS}/${agentId}/chats`);
+  const res = await api.delete(`${ROUTES.AGENTS}/${agentId}/chats`);
   return res.data;
 }
 
 export async function sendMessage(agentId, message) {
-  const res = await api.post(`${CHAT}/${agentId}`, { message });
+  const res = await api.post(`${ROUTES.CHAT}/${agentId}`, { message });
   return res.data;
 }
 
 // ---------- AUTENTICACIÓN -----------------
 
 export async function loginUser(credentials) {
-  const res = await api.post(`${AUTH}/login`, credentials);
+  const res = await api.post(`${ROUTES.AUTH}/login`, credentials);
   const data = res.data;
 
   if (data.token) {
@@ -150,22 +154,22 @@ export async function loginUser(credentials) {
 }
 
 export async function registerUser(data) {
-  const res = await api.post(`${AUTH}/register`, data);
+  const res = await api.post(`${ROUTES.AUTH}/register`, data);
   return res.data;
 }
 
 export async function getProfile() {
-  const res = await api.get(`${AUTH}/me`);
+  const res = await api.get(`${ROUTES.AUTH}/me`);
   return res.data;
 }
 
 export async function getCurrentUser() {
-  const res = await api.get(`${AUTH}/me`);
-  return res.data.user;
+  const res = await api.get(`${ROUTES.AUTH}/me`);
+  return res.data.user; // Asumiendo que el backend responde con { user: { ... } }
 }
 
 export async function changePassword(current_password, new_password) {
-  const res = await api.put(`${AUTH}/change-password`, {
+  const res = await api.put(`${ROUTES.AUTH}/change-password`, {
     current_password,
     new_password,
   });
@@ -173,27 +177,47 @@ export async function changePassword(current_password, new_password) {
 }
 
 export async function updateProfile(data) {
-  const res = await api.put(`${AUTH}/update-profile`, data);
+  const res = await api.put(`${ROUTES.AUTH}/update-profile`, data);
   return res.data;
 }
 
-// ---------- Admin -------------------------
+// ---------- ADMINISTRACIÓN ----------------
 
+// Obtener todos los usuarios (solo admin)
 export async function fetchUsers() {
-  const res = await api.get('/admin/users');
+  const res = await api.get(`${ROUTES.ADMIN}/users`);
   return res.data.users;
 }
 
+// Promover o revocar permisos de admin
 export async function updateUserRole(userId, isAdmin) {
-  const res = await api.put(`/admin/users/${userId}/role`, { isAdmin });
+  const res = await api.put(`${ROUTES.ADMIN}/users/${userId}/role`, { isAdmin });
   return res.data;
 }
 
+// Logs repetidos/reportados
 export async function fetchLogs() {
-  const res = await api.get('/admin/logs');
+  const res = await api.get(`${ROUTES.ADMIN}/logs`);
   return res.data.logs;
 }
 
-// --------- Token inicial ------------------
+// ---------- Utilidades --------------------
 
+// Función para verificar el estado de la conexión con la API
+export async function checkApiHealth() {
+  try {
+    const res = await api.get('/health');
+    return res.data;
+  } catch (error) {
+    console.error('Error al verificar el estado de la API:', error);
+    throw error;
+  }
+}
+
+// Función para obtener la URL base actual (útil para debugging)
+export function getCurrentBaseURL() {
+  return baseURL;
+}
+
+// ---------- Cargar token al iniciar --------
 loadAuthToken();
