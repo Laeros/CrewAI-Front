@@ -8,15 +8,16 @@ const baseURL = isProduction
   ? import.meta.env.VITE_API_URL || 'https://crewaiapp-production.up.railway.app/api'
   : 'http://localhost:5000/api';
 
-// Crear instancia de axios
+// Crear instancia de axios con CORS + credenciales
 const api = axios.create({
   baseURL,
   headers: {
     'Content-Type': 'application/json',
   },
+  withCredentials: true, // 🔥 Esto es esencial para CORS con cookies o sesiones
 });
 
-// Almacenamiento del token JWT
+// Almacenamiento del token JWT (si usas tokens manualmente además de cookies)
 let jwtToken = null;
 
 // ----------- Token Management -------------
@@ -58,8 +59,6 @@ api.interceptors.response.use(
     if (error.response?.status === 401) {
       console.warn('⚠️ Sesión expirada o no autorizada. Redirigiendo al login...');
       clearAuthToken();
-
-      // Redireccionar al login (solo si estamos en navegador)
       if (typeof window !== 'undefined') {
         window.location.href = '/login';
       }
@@ -70,7 +69,6 @@ api.interceptors.response.use(
 
 // ------------ ENDPOINTS -------------------
 
-// Constantes para rutas - TODAS las rutas definidas aquí
 const ROUTES = {
   AUTH: '/auth',
   AGENTS: '/agents',
@@ -145,11 +143,9 @@ export async function sendMessage(agentId, message) {
 export async function loginUser(credentials) {
   const res = await api.post(`${ROUTES.AUTH}/login`, credentials);
   const data = res.data;
-
   if (data.token) {
     setAuthToken(data.token);
   }
-
   return data;
 }
 
@@ -165,7 +161,7 @@ export async function getProfile() {
 
 export async function getCurrentUser() {
   const res = await api.get(`${ROUTES.AUTH}/me`);
-  return res.data.user; // Asumiendo que el backend responde con { user: { ... } }
+  return res.data.user;
 }
 
 export async function changePassword(current_password, new_password) {
@@ -183,19 +179,16 @@ export async function updateProfile(data) {
 
 // ---------- ADMINISTRACIÓN ----------------
 
-// Obtener todos los usuarios (solo admin)
 export async function fetchUsers() {
   const res = await api.get(`${ROUTES.ADMIN}/users`);
   return res.data.users;
 }
 
-// Promover o revocar permisos de admin
 export async function updateUserRole(userId, isAdmin) {
   const res = await api.put(`${ROUTES.ADMIN}/users/${userId}/role`, { isAdmin });
   return res.data;
 }
 
-// Logs repetidos/reportados
 export async function fetchLogs() {
   const res = await api.get(`${ROUTES.ADMIN}/logs`);
   return res.data.logs;
@@ -203,7 +196,6 @@ export async function fetchLogs() {
 
 // ---------- Utilidades --------------------
 
-// Función para verificar el estado de la conexión con la API
 export async function checkApiHealth() {
   try {
     const res = await api.get('/health');
@@ -214,7 +206,6 @@ export async function checkApiHealth() {
   }
 }
 
-// Función para obtener la URL base actual (útil para debugging)
 export function getCurrentBaseURL() {
   return baseURL;
 }
