@@ -1,11 +1,11 @@
 import axios from 'axios';
 
-// Detectar si estamos en producción (Vite usa import.meta.env.MODE)
-const isProduction = import.meta.env.MODE === 'production';
+// Detectar si estamos en producción
+const isProduction = process.env.NODE_ENV === 'production';
 
 // Configurar la base URL dependiendo del entorno
 const baseURL = isProduction
-  ? import.meta.env.VITE_API_URL || 'https://web-production-31e3.up.railway.app/api'
+  ? import.meta.env.VITE_API_URL || 'https://crewaiapp-production.up.railway.app/api'
   : 'http://localhost:5000/api'; // Local dev
 
 // Crear instancia de axios
@@ -13,7 +13,6 @@ const api = axios.create({
   baseURL,
   headers: {
     'Content-Type': 'application/json',
-    console.log("👉 API URL:", baseURL);
   },
 });
 
@@ -21,7 +20,6 @@ const api = axios.create({
 let jwtToken = null;
 
 // ----------- Token Management -------------
-
 export function setAuthToken(token) {
   jwtToken = token;
   localStorage.setItem('jwtToken', token);
@@ -40,7 +38,6 @@ export function clearAuthToken() {
 }
 
 // ------------ Interceptors ----------------
-
 // Interceptor para agregar token a cada request
 api.interceptors.request.use(
   (config) => {
@@ -59,7 +56,6 @@ api.interceptors.response.use(
     if (error.response?.status === 401) {
       console.warn('⚠️ Sesión expirada o no autorizada. Redirigiendo al login...');
       clearAuthToken();
-
       if (typeof window !== 'undefined') {
         window.location.href = '/login';
       }
@@ -69,14 +65,12 @@ api.interceptors.response.use(
 );
 
 // ------------ ENDPOINTS -------------------
-
 const AUTH = '/auth';
 const AGENTS = '/agents';
 const TOOLS = '/tools';
 const CHAT = '/chat';
 
 // ----------- AGENTS -----------------------
-
 export async function fetchAgents() {
   const res = await api.get(AGENTS);
   return res.data;
@@ -98,7 +92,6 @@ export async function deleteAgent(agentId) {
 }
 
 // ------------- TOOLS ----------------------
-
 export async function fetchTools() {
   const res = await api.get(TOOLS);
   return res.data;
@@ -120,7 +113,6 @@ export async function deleteTool(toolId) {
 }
 
 // -------------- CHAT ----------------------
-
 export async function fetchChats(agentId) {
   const res = await api.get(`${AGENTS}/${agentId}/chats`);
   return res.data;
@@ -137,15 +129,12 @@ export async function sendMessage(agentId, message) {
 }
 
 // ---------- AUTENTICACIÓN -----------------
-
 export async function loginUser(credentials) {
   const res = await api.post(`${AUTH}/login`, credentials);
   const data = res.data;
-
   if (data.token) {
     setAuthToken(data.token);
   }
-
   return data;
 }
 
@@ -177,8 +166,10 @@ export async function updateProfile(data) {
   return res.data;
 }
 
-// ---------- Admin -------------------------
+// ---------- Cargar token al iniciar --------
+loadAuthToken();
 
+// ---------- ADMIN --------------------------
 export async function fetchUsers() {
   const res = await api.get('/admin/users');
   return res.data.users;
@@ -193,7 +184,3 @@ export async function fetchLogs() {
   const res = await api.get('/admin/logs');
   return res.data.logs;
 }
-
-// --------- Token inicial ------------------
-
-loadAuthToken();
