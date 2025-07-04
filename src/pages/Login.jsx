@@ -27,7 +27,7 @@ export default function Login() {
         password: credentials.password
       });
 
-      localStorage.setItem('token', response.data.token);
+      localStorage.setItem('token', response.token);
 
       navigate('/main'); // Redirigir al dashboard u otra ruta
     } catch (err) {
