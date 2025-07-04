@@ -14,7 +14,7 @@ const api = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
-  withCredentials: true, // 🔥 Esto es esencial para CORS con cookies o sesiones
+  withCredentials: true,
 });
 
 // Almacenamiento del token JWT (si usas tokens manualmente además de cookies)
@@ -24,19 +24,25 @@ let jwtToken = null;
 
 export function setAuthToken(token) {
   jwtToken = token;
-  localStorage.setItem('jwtToken', token);
+  if (typeof window !== 'undefined' && window.localStorage) {
+    window.localStorage.setItem('jwtToken', token);
+  }
 }
 
 export function loadAuthToken() {
-  const storedToken = localStorage.getItem('jwtToken');
-  if (storedToken) {
-    jwtToken = storedToken;
+  if (typeof window !== 'undefined' && window.localStorage) {
+    const storedToken = window.localStorage.getItem('jwtToken');
+    if (storedToken) {
+      jwtToken = storedToken;
+    }
   }
 }
 
 export function clearAuthToken() {
   jwtToken = null;
-  localStorage.removeItem('jwtToken');
+  if (typeof window !== 'undefined' && window.localStorage) {
+    window.localStorage.removeItem('jwtToken');
+  }
 }
 
 // ------------ Interceptors ----------------
@@ -74,7 +80,7 @@ const ROUTES = {
   AGENTS: '/agents',
   TOOLS: '/tools',
   CHAT: '/chat',
-  ADMIN: '/admin'
+  ADMIN: '/admin',
 };
 
 // ----------- AGENTS -----------------------
@@ -211,4 +217,4 @@ export function getCurrentBaseURL() {
 }
 
 // ---------- Cargar token al iniciar --------
-loadAuthToken();
+// loadAuthToken();
