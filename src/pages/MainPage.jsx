@@ -5,7 +5,7 @@ import AgentForm from '../components/AgentForm';
 import Chat from '../components/Chat';
 import ToolList from '../components/ToolList';
 import ToolForm from '../components/ToolForm';
-import { fetchTools, getCurrentUser } from '../services/api'; // Asegúrate que getCurrentUser exista
+import { fetchTools, getCurrentUser } from '../services/api';
 
 export default function MainPage() {
   const [selectedAgent, setSelectedAgent] = useState(null);

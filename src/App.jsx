@@ -20,22 +20,22 @@ const getStorageItem = (key) => {
 
 // Ruta privada: protege MainPage
 function PrivateRoute({ children }) {
-  const token = getStorageItem('jwtToken'); 
+  const token = getStorageItem('jwtToken');
   return token ? children : <Navigate to="/login" />;
 }
 
 // Ruta privada solo para admins
 function AdminRoute({ children }) {
   const token = getStorageItem('jwtToken');
-  const userStr = getStorageItem('user');
-  const user = userStr ? JSON.parse(userStr) : null;
+  const userStr = getStorageItem('user'); 
+  const user = userStr ? JSON.parse(userStr) : null; 
   
   return token && user?.is_admin ? children : <Navigate to="/main" />;
 }
 
 export default function App() {
   useEffect(() => {
-    if (typeof window !== 'undefined') { // ✅ Verificación agregada
+    if (typeof window !== 'undefined') { 
       loadAuthToken();
     }
   }, []);
