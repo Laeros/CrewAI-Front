@@ -51,12 +51,8 @@ Crea un archivo `.env` en la raíz con:
 VITE_API_URL=
 ```
 
-## 🧑‍💻 Contribución
-
-¡Gracias por tu interés en contribuir!
-
-1. Haz un fork del repositorio.
-2. Crea una nueva rama: `git checkout -b feature/tu-aporte`
-3. Realiza tus cambios y haz commit: `git commit -m 'Descripción de tu aporte'`
-4. Haz push a tu rama: `git push origin feature/tu-aporte`
-5. Abre un Pull Request explicando tu contribución.
+## 🧑‍💻 Integrantes  
+Rodrigo Cesar Ancori Tacca ( Laeros ) ( 10 / 10 )
+Evelyn Milagros Chipana Ramos ( EMCR30 ) ( 10 / 10 )
+Rodrigo Alonso Ruelas Lope ( Rodrigo Ruelas ) ( 10 / 10 )
+Leandro Estrada ( 9 / 10 )
