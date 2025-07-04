@@ -10,22 +10,34 @@ import Logout from './components/Logout';
 import './styles/main.css'
 import { loadAuthToken } from './services/api';
 
+// Helper para acceso seguro a localStorage
+const getStorageItem = (key) => {
+  if (typeof window !== 'undefined' && window.localStorage) {
+    return localStorage.getItem(key);
+  }
+  return null;
+};
+
 // Ruta privada: protege MainPage
 function PrivateRoute({ children }) {
-  const token = localStorage.getItem('jwtToken');
+  const token = getStorageItem('jwtToken'); 
   return token ? children : <Navigate to="/login" />;
 }
 
-//Ruta privada solo para admins
-function AdminRoute({ children }){
-  const token = localstorage.getItem('jwtToken');
-  const user = JSON.parse(localStorage.getItem('user'));
+// Ruta privada solo para admins
+function AdminRoute({ children }) {
+  const token = getStorageItem('jwtToken');
+  const userStr = getStorageItem('user');
+  const user = userStr ? JSON.parse(userStr) : null;
+  
   return token && user?.is_admin ? children : <Navigate to="/main" />;
 }
 
 export default function App() {
   useEffect(() => {
-    loadAuthToken();
+    if (typeof window !== 'undefined') { // ✅ Verificación agregada
+      loadAuthToken();
+    }
   }, []);
 
   return (
@@ -37,7 +49,7 @@ export default function App() {
 
           {/* Rutas públicas */}
           <Route path="/login" element={<Login />} />
-          <Route path="/logout" element={<Logout />} />  {/* ruta logout */}
+          <Route path="/logout" element={<Logout />} />
           <Route path="/register" element={<Register />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/reset-password" element={<ResetPassword />} />
