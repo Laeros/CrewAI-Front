@@ -1,12 +1,62 @@
-# React + Vite
+# CrewAI Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Interfaz web para el sistema de agentes conversacionales inteligentes **CrewAI**. Esta aplicación permite a los usuarios interactuar con agentes IA, crear y personalizar herramientas, así como gestionar el acceso administrativo.
 
-Currently, two official plugins are available:
+## 🚀 Tecnologías
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- React
+- Vite
+- Axios
+- React Router DOM
+- Tailwind CSS (opcional)
+- JWT + LocalStorage
 
-## Expanding the ESLint configuration
+## 📦 Instalación
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+```bash
+git clone https://github.com/Laeros/CrewAI-Front.git
+cd CrewAI-Front
+npm install
+```
+
+## 🧪 Scripts disponibles
+
+```bash
+npm run dev        # Inicia servidor de desarrollo
+npm run build      # Compila la app para producción
+npm run preview    # Visualiza la app compilada localmente
+```
+
+## ⚙️ Despliegue en Producción
+
+1. Ejecuta el build:
+
+```bash
+npm run build
+```
+
+2. Copia la carpeta `dist/` al servidor web (por ejemplo NGINX):
+
+```bash
+cp -r dist/* /usr/share/nginx/html/
+```
+
+3. Asegúrate de que el backend esté sirviendo en la ruta `/api`.
+
+## 🔐 Variables de Entorno
+
+Crea un archivo `.env` en la raíz con:
+
+```
+VITE_API_URL=
+```
+
+## 🧑‍💻 Contribución
+
+¡Gracias por tu interés en contribuir!
+
+1. Haz un fork del repositorio.
+2. Crea una nueva rama: `git checkout -b feature/tu-aporte`
+3. Realiza tus cambios y haz commit: `git commit -m 'Descripción de tu aporte'`
+4. Haz push a tu rama: `git push origin feature/tu-aporte`
+5. Abre un Pull Request explicando tu contribución.
