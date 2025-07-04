@@ -81,7 +81,7 @@ const ROUTES = {
   AGENTS: '/agents',
   TOOLS: '/tools',
   CHAT: '/chat',
-  ADMIN: '/admin'
+  ADMIN: '/admin',
 };
 
 // ----------- AGENTS -----------------------
