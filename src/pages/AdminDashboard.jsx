@@ -14,7 +14,7 @@ export default function AdminDashboard() {
       setLoading(true);
       setError(null);
       try {
-        const token = localStorage.getItem('authToken'); // Ajusta según tu auth
+        const token = localStorage.getItem('jwtToken');
 
         const res = await fetch(`/api/admin/logs?page=${page}&limit=${logsPerPage}`, {
           headers: {
